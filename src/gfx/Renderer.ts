@@ -1,23 +1,46 @@
-import type { WebGPUContext } from "../core/initWebGPU.ts"
+import { WebGPUDeviceManager } from "./WebGPUDeviceManager.ts"
+import { GPUBufferWrapper } from "./GPUBufferWrapper.ts"
+import { BasicPipeline } from "./pipelines/BasicPipeline.ts"
+import shaderCode from "../assets/shaders/triangle.wgsl?raw"
 
 export class Renderer {
-	constructor(private context: WebGPUContext) {}
+	private pipeline: BasicPipeline
+	private vertexBuffer: GPUBufferWrapper
+
+	constructor() {
+		this.pipeline = new BasicPipeline(shaderCode)
+
+		const vertexData = new Float32Array([
+			0.0, 0.5, 1.0, 0.0, 0.0, -0.5, -0.5, 0.0, 1.0, 0.0, 0.5, -0.5, 0.0, 0.0,
+			1.0,
+		])
+
+		this.vertexBuffer = new GPUBufferWrapper(vertexData, GPUBufferUsage.VERTEX)
+	}
 
 	render() {
-		const commandEncoder = this.context.device.createCommandEncoder()
-		const textureView = this.context.context.getCurrentTexture().createView()
-		const renderPass = commandEncoder.beginRenderPass({
+		const device = WebGPUDeviceManager.device
+		const context = WebGPUDeviceManager.context
+
+		const encoder = device.createCommandEncoder()
+		const view = context.getCurrentTexture().createView()
+
+		const pass = encoder.beginRenderPass({
 			colorAttachments: [
 				{
-					view: textureView,
+					view,
 					clearValue: { r: 0.1, g: 0.1, b: 0.1, a: 1 },
 					loadOp: "clear",
 					storeOp: "store",
 				},
 			],
 		})
-		renderPass.end()
 
-		this.context.device.queue.submit([commandEncoder.finish()])
+		pass.setPipeline(this.pipeline.pipeline)
+		pass.setVertexBuffer(0, this.vertexBuffer.buffer)
+		pass.draw(3)
+		pass.end()
+
+		device.queue.submit([encoder.finish()])
 	}
 }
