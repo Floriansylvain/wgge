@@ -1,14 +1,13 @@
 import { WebGPUDeviceManager } from "./WebGPUDeviceManager.ts"
-import { BasicPipeline } from "./pipelines/BasicPipeline.ts"
 import { GPUTextureWrapper } from "./GPUTextureWrapper.ts"
 import shaderCode from "../assets/shaders/triangle.wgsl?raw"
 import { Camera } from "../camera/Camera.ts"
 import { CameraUniform } from "./CameraUniform.ts"
 import { Mesh } from "./Mesh.ts"
 import { SceneObject } from "../scene/SceneObject.ts"
+import { Material } from "./Material.ts"
 
 export class Renderer {
-	private pipeline: BasicPipeline
 	private depthTexture: GPUTextureWrapper
 
 	private camera = new Camera()
@@ -25,7 +24,6 @@ export class Renderer {
 		this.camera.aspect = width / height
 		this.cameraUniform.update(this.camera.viewProjection)
 
-		this.pipeline = new BasicPipeline(shaderCode)
 		this.depthTexture = new GPUTextureWrapper(
 			width,
 			height,
@@ -34,12 +32,20 @@ export class Renderer {
 		)
 
 		const cubeMesh = Mesh.createCube()
+		const material = new Material(shaderCode, [
+			{
+				arrayStride: 24,
+				attributes: [
+					{ shaderLocation: 0, offset: 0, format: "float32x3" },
+					{ shaderLocation: 1, offset: 12, format: "float32x3" },
+				],
+			},
+		])
 		const cube = new SceneObject(
 			cubeMesh,
-			this.pipeline.pipeline,
+			material,
 			this.cameraUniform.buffer.buffer,
 		)
-
 		this.sceneObjects.push(cube)
 	}
 
@@ -72,7 +78,6 @@ export class Renderer {
 			obj.transform.reset()
 			obj.transform.rotateY(this.angle)
 			obj.updateModelMatrix()
-			pass.setPipeline(this.pipeline.pipeline)
 			obj.draw(pass)
 		}
 

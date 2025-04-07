@@ -1,10 +1,11 @@
-import { WebGPUDeviceManager } from "../WebGPUDeviceManager.ts"
+import { WebGPUDeviceManager } from "./WebGPUDeviceManager.ts"
 
-export class BasicPipeline {
+export class Material {
 	public readonly pipeline: GPURenderPipeline
 
-	constructor(shaderCode: string) {
+	constructor(shaderCode: string, vertexLayout: GPUVertexBufferLayout[]) {
 		const device = WebGPUDeviceManager.device
+		const format = WebGPUDeviceManager.format
 
 		const shaderModule = device.createShaderModule({ code: shaderCode })
 
@@ -13,21 +14,12 @@ export class BasicPipeline {
 			vertex: {
 				module: shaderModule,
 				entryPoint: "vs_main",
-				buffers: [
-					{
-						arrayStride: 24,
-						attributes: [
-							{ shaderLocation: 0, offset: 0, format: "float32x3" }, // pos
-							{ shaderLocation: 1, offset: 12, format: "float32x3" }, // color
-						],
-					},
-				],
+				buffers: vertexLayout,
 			},
-
 			fragment: {
 				module: shaderModule,
 				entryPoint: "fs_main",
-				targets: [{ format: WebGPUDeviceManager.format }],
+				targets: [{ format }],
 			},
 			primitive: {
 				topology: "triangle-list",
@@ -39,5 +31,9 @@ export class BasicPipeline {
 				format: "depth24plus",
 			},
 		})
+	}
+
+	getBindGroupLayout(): GPUBindGroupLayout {
+		return this.pipeline.getBindGroupLayout(0)
 	}
 }

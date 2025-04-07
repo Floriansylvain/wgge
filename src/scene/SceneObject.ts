@@ -2,6 +2,7 @@ import { Transform } from "./Transform.ts"
 import { Mesh } from "../gfx/Mesh.ts"
 import { GPUBufferWrapper } from "../gfx/GPUBufferWrapper.ts"
 import { WebGPUDeviceManager } from "../gfx/WebGPUDeviceManager.ts"
+import { Material } from "../gfx/Material.ts"
 
 export class SceneObject {
 	public readonly transform = new Transform()
@@ -10,19 +11,21 @@ export class SceneObject {
 		GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
 	)
 	public readonly bindGroup: GPUBindGroup
+	public readonly material: Material
 
 	constructor(
 		public readonly mesh: Mesh,
-		pipeline: GPURenderPipeline,
+		material: Material,
 		cameraBuffer: GPUBuffer,
 	) {
 		this.bindGroup = WebGPUDeviceManager.device.createBindGroup({
-			layout: pipeline.getBindGroupLayout(0),
+			layout: material.pipeline.getBindGroupLayout(0),
 			entries: [
 				{ binding: 0, resource: { buffer: cameraBuffer } },
 				{ binding: 1, resource: { buffer: this.modelBuffer.buffer } },
 			],
 		})
+		this.material = material
 	}
 
 	updateModelMatrix() {
@@ -34,6 +37,7 @@ export class SceneObject {
 	}
 
 	draw(pass: GPURenderPassEncoder) {
+		pass.setPipeline(this.material.pipeline)
 		pass.setBindGroup(0, this.bindGroup)
 		this.mesh.draw(pass)
 	}
