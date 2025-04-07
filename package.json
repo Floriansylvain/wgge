@@ -15,6 +15,7 @@
 	},
 	"dependencies": {
 		"@webgpu/types": "^0.1.60",
-		"webgpu": "^0.2.11"
+		"webgpu": "^0.2.11",
+		"wgpu-matrix": "^3.4.0"
 	}
 }

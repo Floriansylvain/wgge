@@ -14,6 +14,9 @@ importers:
       webgpu:
         specifier: ^0.2.11
         version: 0.2.11
+      wgpu-matrix:
+        specifier: ^3.4.0
+        version: 3.4.0
     devDependencies:
       prettier:
         specifier: 3.5.3
@@ -367,6 +370,9 @@ packages:
   webgpu@0.2.11:
     resolution: {integrity: sha512-eF6pVzdtqmIhREDNkZWMzktHoeS9jIa649wrNvc9/ZDsqC8WBuTpS8af1UoLbQzyvCn34IsHPqMCxG2uTe7lOg==}
 
+  wgpu-matrix@3.4.0:
+    resolution: {integrity: sha512-kXHrbAPKEn9A32Wf4wVldyx9MmnzwhuB5p8GCqoJP3ItU5+iDT4J3aTQwPZWkfb153hwGtqZtUwR2M+ipJKadg==}
+
 snapshots:
 
   '@esbuild/aix-ppc64@0.25.2':
@@ -592,3 +598,5 @@ snapshots:
   webgpu@0.2.11:
     dependencies:
       '@webgpu/types': 0.1.60
+
+  wgpu-matrix@3.4.0: {}

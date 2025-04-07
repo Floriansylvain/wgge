@@ -6,7 +6,7 @@ export class GPUBufferWrapper {
 	public readonly usage: number
 
 	constructor(
-		dataOrSize: Float32Array | Uint32Array | number,
+		dataOrSize: ArrayBufferView | number,
 		usage: number,
 		mappedAtCreation = false,
 	) {

@@ -17,9 +17,8 @@ export class BasicPipeline {
 					{
 						arrayStride: 24,
 						attributes: [
-							{ shaderLocation: 0, offset: 0, format: "float32x2" }, // pos
-							{ shaderLocation: 1, offset: 8, format: "float32x3" }, // color
-							{ shaderLocation: 2, offset: 20, format: "float32" }, // z
+							{ shaderLocation: 0, offset: 0, format: "float32x3" }, // pos
+							{ shaderLocation: 1, offset: 12, format: "float32x3" }, // color
 						],
 					},
 				],
