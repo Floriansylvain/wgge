@@ -1,28 +1,21 @@
 import { WebGPUDeviceManager } from "./WebGPUDeviceManager.ts"
-import { GPUBufferWrapper } from "./GPUBufferWrapper.ts"
 import { BasicPipeline } from "./pipelines/BasicPipeline.ts"
 import { GPUTextureWrapper } from "./GPUTextureWrapper.ts"
 import shaderCode from "../assets/shaders/triangle.wgsl?raw"
 import { Camera } from "../camera/Camera.ts"
 import { CameraUniform } from "./CameraUniform.ts"
-import { Transform } from "../scene/Transform.ts"
+import { Mesh } from "./Mesh.ts"
+import { SceneObject } from "../scene/SceneObject.ts"
 
 export class Renderer {
 	private pipeline: BasicPipeline
-	private vertexBuffer: GPUBufferWrapper
 	private depthTexture: GPUTextureWrapper
 
 	private camera = new Camera()
 	private cameraUniform = new CameraUniform()
-	private bindGroup: GPUBindGroup
-
-	private indexBuffer: GPUBufferWrapper
-	private transform = new Transform()
-	private modelBuffer = new GPUBufferWrapper(
-		64,
-		GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-	)
 	private angle = 0
+
+	private sceneObjects: SceneObject[] = []
 
 	constructor() {
 		const canvas = WebGPUDeviceManager.context.canvas as HTMLCanvasElement
@@ -39,42 +32,15 @@ export class Renderer {
 			"depth24plus",
 			GPUTextureUsage.RENDER_ATTACHMENT,
 		)
-		this.bindGroup = WebGPUDeviceManager.device.createBindGroup({
-			layout: this.pipeline.pipeline.getBindGroupLayout(0),
-			entries: [
-				{ binding: 0, resource: { buffer: this.cameraUniform.buffer.buffer } },
-				{ binding: 1, resource: { buffer: this.modelBuffer.buffer } },
-			],
-		})
 
-		// prettier-ignore
-		const cubeVertices = new Float32Array([
-			// x    y    z     r    g    b
-			-1, -1,  1,   1, 0, 0,  // Front
-			 1, -1,  1,   0, 1, 0,
-			 1,  1,  1,   0, 0, 1,
-			-1,  1,  1,   1, 1, 0,
-			-1, -1, -1,   1, 0, 1,  // Back
-			 1, -1, -1,   0, 1, 1,
-			 1,  1, -1,   1, 1, 1,
-			-1,  1, -1,   0, 0, 0,
-		])
-
-		// prettier-ignore
-		const cubeIndices = new Uint16Array([
-			0, 1, 2,  0, 2, 3,
-			1, 5, 6,  1, 6, 2,
-			5, 4, 7,  5, 7, 6,
-			4, 0, 3,  4, 3, 7,
-			3, 2, 6,  3, 6, 7,
-			4, 5, 1,  4, 1, 0,
-		])
-
-		this.vertexBuffer = new GPUBufferWrapper(
-			cubeVertices,
-			GPUBufferUsage.VERTEX,
+		const cubeMesh = Mesh.createCube()
+		const cube = new SceneObject(
+			cubeMesh,
+			this.pipeline.pipeline,
+			this.cameraUniform.buffer.buffer,
 		)
-		this.indexBuffer = new GPUBufferWrapper(cubeIndices, GPUBufferUsage.INDEX)
+
+		this.sceneObjects.push(cube)
 	}
 
 	render() {
@@ -101,23 +67,16 @@ export class Renderer {
 			},
 		})
 
-		this.angle += 0.02
-		this.transform.reset()
-		this.transform.rotateY(this.angle)
+		this.angle += 0.01
+		for (const obj of this.sceneObjects) {
+			obj.transform.reset()
+			obj.transform.rotateY(this.angle)
+			obj.updateModelMatrix()
+			pass.setPipeline(this.pipeline.pipeline)
+			obj.draw(pass)
+		}
 
-		device.queue.writeBuffer(
-			this.modelBuffer.buffer,
-			0,
-			new Float32Array(this.transform.modelMatrix).buffer,
-		)
-
-		pass.setPipeline(this.pipeline.pipeline)
-		pass.setBindGroup(0, this.bindGroup)
-		pass.setVertexBuffer(0, this.vertexBuffer.buffer)
-		pass.setIndexBuffer(this.indexBuffer.buffer, "uint16")
-		pass.drawIndexed(36)
 		pass.end()
-
 		device.queue.submit([encoder.finish()])
 	}
 }
