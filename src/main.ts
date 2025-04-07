@@ -1,14 +1,18 @@
 import { initWebGPU } from "./core/initWebGPU.ts"
+import { Renderer } from "./gfx/Renderer.ts"
 
 async function main() {
 	const canvas = document.getElementById("gfx-canvas") as HTMLCanvasElement
-	if (!canvas) {
-		throw new Error("Canvas element not found.")
+
+	const webgpu = await initWebGPU(canvas)
+	const renderer = new Renderer(webgpu)
+
+	function frame() {
+		renderer.render()
+		requestAnimationFrame(frame)
 	}
 
-	const { device, context, format } = await initWebGPU(canvas)
-
-	console.log("WebGPU initialized", { device, context, format })
+	requestAnimationFrame(frame)
 }
 
 main().catch(console.error)
