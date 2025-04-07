@@ -2,6 +2,7 @@ import { WebGPUDeviceManager } from "../core/WebGPUDeviceManager.ts"
 import { GPUTextureWrapper } from "../core/GPUTextureWrapper.ts"
 import shaderCode from "../assets/shaders/lambert.wgsl?raw"
 import { Camera } from "../camera/Camera.ts"
+import { FirstPersonCameraController } from "../camera/FirstPersonCameraController.ts"
 import { CameraUniform } from "./CameraUniform.ts"
 import { Mesh } from "./Mesh.ts"
 import { SceneObject } from "../scene/SceneObject.ts"
@@ -24,6 +25,9 @@ export class Renderer {
 		this.camera.aspect = width / height
 		this.cameraUniform.update(this.camera.viewProjection)
 		this.lightUniform.update([0.5, -1, -0.5], [1, 1, 1])
+
+		const controller = new FirstPersonCameraController(this.camera)
+		this.scene.attachCameraController(controller)
 
 		this.depthTexture = new GPUTextureWrapper(
 			width,
@@ -54,6 +58,7 @@ export class Renderer {
 
 	render(deltaTime: number) {
 		this.scene.update(deltaTime)
+		this.cameraUniform.update(this.camera.viewProjection)
 
 		const device = WebGPUDeviceManager.device
 		const context = WebGPUDeviceManager.context
@@ -78,6 +83,7 @@ export class Renderer {
 		})
 
 		this.scene.render(pass)
+
 		pass.end()
 		device.queue.submit([encoder.finish()])
 	}
