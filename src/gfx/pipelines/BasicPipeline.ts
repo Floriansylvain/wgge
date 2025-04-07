@@ -15,14 +15,16 @@ export class BasicPipeline {
 				entryPoint: "vs_main",
 				buffers: [
 					{
-						arrayStride: 20,
+						arrayStride: 24,
 						attributes: [
-							{ shaderLocation: 0, offset: 0, format: "float32x2" },
-							{ shaderLocation: 1, offset: 8, format: "float32x3" },
+							{ shaderLocation: 0, offset: 0, format: "float32x2" }, // pos
+							{ shaderLocation: 1, offset: 8, format: "float32x3" }, // color
+							{ shaderLocation: 2, offset: 20, format: "float32" }, // z
 						],
 					},
 				],
 			},
+
 			fragment: {
 				module: shaderModule,
 				entryPoint: "fs_main",
@@ -31,6 +33,11 @@ export class BasicPipeline {
 			primitive: {
 				topology: "triangle-list",
 				cullMode: "back",
+			},
+			depthStencil: {
+				depthWriteEnabled: true,
+				depthCompare: "less",
+				format: "depth24plus",
 			},
 		})
 	}

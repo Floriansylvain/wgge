@@ -1,18 +1,34 @@
 import { WebGPUDeviceManager } from "./WebGPUDeviceManager.ts"
 import { GPUBufferWrapper } from "./GPUBufferWrapper.ts"
 import { BasicPipeline } from "./pipelines/BasicPipeline.ts"
+import { GPUTextureWrapper } from "./GPUTextureWrapper.ts"
 import shaderCode from "../assets/shaders/triangle.wgsl?raw"
 
 export class Renderer {
 	private pipeline: BasicPipeline
 	private vertexBuffer: GPUBufferWrapper
+	private depthTexture: GPUTextureWrapper
 
 	constructor() {
+		const canvas = WebGPUDeviceManager.context.canvas as HTMLCanvasElement
+		const width = canvas.width
+		const height = canvas.height
+
 		this.pipeline = new BasicPipeline(shaderCode)
+		this.depthTexture = new GPUTextureWrapper(
+			width,
+			height,
+			"depth24plus",
+			GPUTextureUsage.RENDER_ATTACHMENT,
+		)
 
 		const vertexData = new Float32Array([
-			0.0, 0.5, 1.0, 0.0, 0.0, -0.5, -0.5, 0.0, 1.0, 0.0, 0.5, -0.5, 0.0, 0.0,
-			1.0,
+			// Triangle A (closer - RED)
+			0.0, 0.5, 1.0, 0.0, 0.0, 0.2, -0.5, -0.5, 1.0, 0.0, 0.0, 0.2, 0.5, -0.5,
+			1.0, 0.0, 0.0, 0.2,
+			// Triangle B (further - GREEN)
+			0.0, 0.5, 0.0, 1.0, 0.0, 0.8, -0.5, -0.5, 0.0, 1.0, 0.0, 0.8, 0.5, -0.5,
+			0.0, 1.0, 0.0, 0.8,
 		])
 
 		this.vertexBuffer = new GPUBufferWrapper(vertexData, GPUBufferUsage.VERTEX)
@@ -34,6 +50,12 @@ export class Renderer {
 					storeOp: "store",
 				},
 			],
+			depthStencilAttachment: {
+				view: this.depthTexture.view,
+				depthClearValue: 1.0,
+				depthLoadOp: "clear",
+				depthStoreOp: "store",
+			},
 		})
 
 		pass.setPipeline(this.pipeline.pipeline)
