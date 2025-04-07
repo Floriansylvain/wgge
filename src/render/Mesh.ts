@@ -1,4 +1,4 @@
-import { GPUBufferWrapper } from "./GPUBufferWrapper.ts"
+import { GPUBufferWrapper } from "../core/GPUBufferWrapper.ts"
 
 export class Mesh {
 	public readonly vertexBuffer: GPUBufferWrapper

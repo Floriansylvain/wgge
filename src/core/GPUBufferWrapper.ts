@@ -1,4 +1,4 @@
-import { WebGPUDeviceManager } from "./WebGPUDeviceManager.ts"
+import { WebGPUDeviceManager } from "./WebGPUDeviceManager"
 
 export class GPUBufferWrapper {
 	public readonly buffer: GPUBuffer

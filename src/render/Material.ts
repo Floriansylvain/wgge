@@ -1,4 +1,4 @@
-import { WebGPUDeviceManager } from "./WebGPUDeviceManager.ts"
+import { WebGPUDeviceManager } from "../core/WebGPUDeviceManager.ts"
 
 export class Material {
 	public readonly pipeline: GPURenderPipeline

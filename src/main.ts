@@ -1,6 +1,6 @@
-import { WebGPUDeviceManager } from "./gfx/WebGPUDeviceManager.ts"
-import { Renderer } from "./gfx/Renderer.ts"
-import { Clock } from "./gfx/Clock.ts"
+import { WebGPUDeviceManager } from "./core/WebGPUDeviceManager.ts"
+import { Renderer } from "./render/Renderer.ts"
+import { Clock } from "./core/Clock.ts"
 
 async function main() {
 	const canvas = document.getElementById("gfx-canvas") as HTMLCanvasElement

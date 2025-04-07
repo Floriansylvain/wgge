@@ -1,9 +1,9 @@
 import { Transform } from "./Transform.ts"
-import { Mesh } from "../gfx/Mesh.ts"
-import { GPUBufferWrapper } from "../gfx/GPUBufferWrapper.ts"
-import { WebGPUDeviceManager } from "../gfx/WebGPUDeviceManager.ts"
-import { Material } from "../gfx/Material.ts"
-import { NormalMatrix } from "../gfx/NormalMatrix.ts"
+import { Mesh } from "../render/Mesh.ts"
+import { GPUBufferWrapper } from "../core/GPUBufferWrapper.ts"
+import { WebGPUDeviceManager } from "../core/WebGPUDeviceManager.ts"
+import { Material } from "../render/Material.ts"
+import { NormalMatrix } from "./NormalMatrix.ts"
 
 export class SceneObject {
 	public readonly transform = new Transform()

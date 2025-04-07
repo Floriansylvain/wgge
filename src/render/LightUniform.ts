@@ -1,5 +1,5 @@
-import { WebGPUDeviceManager } from "./WebGPUDeviceManager.ts"
-import { GPUBufferWrapper } from "./GPUBufferWrapper.ts"
+import { WebGPUDeviceManager } from "../core/WebGPUDeviceManager.ts"
+import { GPUBufferWrapper } from "../core/GPUBufferWrapper.ts"
 
 export class LightUniform {
 	public readonly buffer: GPUBufferWrapper

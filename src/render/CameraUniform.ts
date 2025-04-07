@@ -1,5 +1,5 @@
-import { GPUBufferWrapper } from "./GPUBufferWrapper.ts"
-import { WebGPUDeviceManager } from "./WebGPUDeviceManager.ts"
+import { GPUBufferWrapper } from "../core/GPUBufferWrapper.ts"
+import { WebGPUDeviceManager } from "../core/WebGPUDeviceManager.ts"
 
 export class CameraUniform {
 	public readonly buffer: GPUBufferWrapper
