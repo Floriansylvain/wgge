@@ -6,6 +6,7 @@ import { CameraUniform } from "./CameraUniform.ts"
 import { Mesh } from "./Mesh.ts"
 import { SceneObject } from "../scene/SceneObject.ts"
 import { Material } from "./Material.ts"
+import { LightUniform } from "./LightUniform.ts"
 
 export class Renderer {
 	private depthTexture: GPUTextureWrapper
@@ -16,6 +17,8 @@ export class Renderer {
 
 	private sceneObjects: SceneObject[] = []
 
+	private lightUniform = new LightUniform()
+
 	constructor() {
 		const canvas = WebGPUDeviceManager.context.canvas as HTMLCanvasElement
 		const width = canvas.width
@@ -23,6 +26,8 @@ export class Renderer {
 
 		this.camera.aspect = width / height
 		this.cameraUniform.update(this.camera.viewProjection)
+
+		this.lightUniform.update([0.5, -1, -0.5], [1, 1, 1])
 
 		this.depthTexture = new GPUTextureWrapper(
 			width,
@@ -34,10 +39,11 @@ export class Renderer {
 		const cubeMesh = Mesh.createCube()
 		const material = new Material(shaderCode, [
 			{
-				arrayStride: 24,
+				arrayStride: 36,
 				attributes: [
-					{ shaderLocation: 0, offset: 0, format: "float32x3" },
-					{ shaderLocation: 1, offset: 12, format: "float32x3" },
+					{ shaderLocation: 0, offset: 0, format: "float32x3" }, // pos
+					{ shaderLocation: 1, offset: 12, format: "float32x3" }, // color
+					{ shaderLocation: 2, offset: 24, format: "float32x3" }, // normal
 				],
 			},
 		])
@@ -45,6 +51,7 @@ export class Renderer {
 			cubeMesh,
 			material,
 			this.cameraUniform.buffer.buffer,
+			this.lightUniform.buffer.buffer,
 		)
 		this.sceneObjects.push(cube)
 	}
@@ -73,10 +80,11 @@ export class Renderer {
 			},
 		})
 
-		this.angle += 0.01
+		this.angle += 0.005
 		for (const obj of this.sceneObjects) {
 			obj.transform.reset()
 			obj.transform.rotateY(this.angle)
+			obj.transform.rotateX(this.angle)
 			obj.updateModelMatrix()
 			obj.draw(pass)
 		}

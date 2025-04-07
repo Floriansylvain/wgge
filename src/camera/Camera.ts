@@ -1,11 +1,9 @@
-import { mat4 } from "wgpu-matrix"
-
-type vec3 = [number, number, number]
+import { mat4, vec3, Vec3 } from "wgpu-matrix"
 
 export class Camera {
-	public position: vec3 = [0, 2, 5]
-	public target: vec3 = [0, 0, 0]
-	public up: vec3 = [0, 1, 0]
+	public position: Vec3 = vec3.create(0, 2, 5)
+	public target: Vec3 = vec3.create(0, 0, 0)
+	public up: Vec3 = vec3.create(0, 1, 0)
 
 	public fov = Math.PI / 3
 	public aspect = 1

@@ -3,14 +3,18 @@ import { WebGPUDeviceManager } from "./WebGPUDeviceManager.ts"
 export class Material {
 	public readonly pipeline: GPURenderPipeline
 
-	constructor(shaderCode: string, vertexLayout: GPUVertexBufferLayout[]) {
+	constructor(
+		shaderCode: string,
+		vertexLayout: GPUVertexBufferLayout[],
+		layout: GPUPipelineLayout | "auto" = "auto",
+	) {
 		const device = WebGPUDeviceManager.device
 		const format = WebGPUDeviceManager.format
 
 		const shaderModule = device.createShaderModule({ code: shaderCode })
 
 		this.pipeline = device.createRenderPipeline({
-			layout: "auto",
+			layout,
 			vertex: {
 				module: shaderModule,
 				entryPoint: "vs_main",
@@ -24,6 +28,7 @@ export class Material {
 			primitive: {
 				topology: "triangle-list",
 				cullMode: "back",
+				frontFace: "ccw",
 			},
 			depthStencil: {
 				depthWriteEnabled: true,
@@ -33,7 +38,7 @@ export class Material {
 		})
 	}
 
-	getBindGroupLayout(): GPUBindGroupLayout {
-		return this.pipeline.getBindGroupLayout(0)
+	getBindGroupLayout(group: number = 0): GPUBindGroupLayout {
+		return this.pipeline.getBindGroupLayout(group)
 	}
 }
