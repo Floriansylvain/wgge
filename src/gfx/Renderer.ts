@@ -7,17 +7,14 @@ import { Mesh } from "./Mesh.ts"
 import { SceneObject } from "../scene/SceneObject.ts"
 import { Material } from "./Material.ts"
 import { LightUniform } from "./LightUniform.ts"
+import { Scene } from "../scene/Scene.ts"
 
 export class Renderer {
 	private depthTexture: GPUTextureWrapper
-
 	private camera = new Camera()
 	private cameraUniform = new CameraUniform()
-	private angle = 0
-
-	private sceneObjects: SceneObject[] = []
-
 	private lightUniform = new LightUniform()
+	private scene = new Scene()
 
 	constructor() {
 		const canvas = WebGPUDeviceManager.context.canvas as HTMLCanvasElement
@@ -26,7 +23,6 @@ export class Renderer {
 
 		this.camera.aspect = width / height
 		this.cameraUniform.update(this.camera.viewProjection)
-
 		this.lightUniform.update([0.5, -1, -0.5], [1, 1, 1])
 
 		this.depthTexture = new GPUTextureWrapper(
@@ -53,13 +49,14 @@ export class Renderer {
 			this.cameraUniform.buffer.buffer,
 			this.lightUniform.buffer.buffer,
 		)
-		this.sceneObjects.push(cube)
+		this.scene.add(cube)
 	}
 
-	render() {
+	render(deltaTime: number) {
+		this.scene.update(deltaTime)
+
 		const device = WebGPUDeviceManager.device
 		const context = WebGPUDeviceManager.context
-
 		const encoder = device.createCommandEncoder()
 		const view = context.getCurrentTexture().createView()
 
@@ -80,15 +77,7 @@ export class Renderer {
 			},
 		})
 
-		this.angle += 0.005
-		for (const obj of this.sceneObjects) {
-			obj.transform.reset()
-			obj.transform.rotateY(this.angle)
-			obj.transform.rotateX(this.angle)
-			obj.updateModelMatrix()
-			obj.draw(pass)
-		}
-
+		this.scene.render(pass)
 		pass.end()
 		device.queue.submit([encoder.finish()])
 	}
