@@ -5,40 +5,42 @@ This project aims to create a game engine using WebGPU + Typescript. It should p
 ## ToDo V1
 
 ### 1. Project Setup & Dev Workflow
-- [ ] Modular project structure
-- [ ] Build tooling (Vite/Webpack)
-- [ ] WebGPU adapter check
+- [x] Modular project structure (`src/` is now cleanly organized into `core/`, `render/`, `scene/`, etc.)
+- [x] Build tooling (Vite/Webpack) (`vite` with TypeScript + Prettier)
+- [x] WebGPU adapter check (`initWebGPU.ts` & `WebGPUDeviceManager`)
 - [ ] Debug overlay
 - [ ] Scene inspector (dev-only)
 
 ### 2. Low-Level WebGPU Abstractions
-- [ ] Device and context manager
-- [ ] Buffer abstraction (uniform, vertex, index, storage)
-- [ ] Texture abstraction (2D, depth, shadow)
-- [ ] Pipeline abstraction
-- [ ] Command encoder abstraction
+- [x] Device and context manager (`WebGPUDeviceManager.ts`)
+- [x] Buffer abstraction (uniform, vertex, index, storage) (`GPUBufferWrapper.ts`)
+- [x] Texture abstraction (2D, depth, shadow) (`GPUTextureWrapper.ts`)
+- [x] Pipeline abstraction (`Material.ts`)
+- [ ] Command encoder abstraction (currently used directly in `Renderer`)
 
 ### 3. Rendering System
-- [ ] Basic forward renderer
-- [ ] Lighting (directional, point)
+- [x] Basic forward renderer (`Renderer.ts` + `SceneObject`)
+- [x] Lighting (directional) (`LightUniform`, WGSL, Lambert shading)
+- [ ] Point lighting
 - [ ] Skybox or procedural background
-- [ ] Depth testing and face culling
+- [x] Depth testing and face culling (depth texture + backface culling)
 
 ### 4. Camera System
-- [ ] Perspective & orthographic camera classes
+- [x] Perspective camera (`Camera.ts`)
+- [ ] Orthographic camera
 - [ ] First-person camera controller
 - [ ] Frustum culling
-- [ ] Camera matrix uniforms
+- [x] Camera matrix uniforms (`CameraUniform.ts`)
 
 ### 5. Entity-Component System (ECS)
 - [ ] Unique entities
-- [ ] Basic components (Transform, Mesh, Light, etc.)
-- [ ] Update and render systems
+- [x] Basic components (Transform, Mesh, Light, etc.)
+- [x] Update and render systems (via `Scene.ts`)
 - [ ] Event system or messaging
 
 ### 6. Game Loop & Time Management
-- [ ] Delta time and fixed update
-- [ ] Game loop with update/render separation
+- [x] Delta time (`Clock.ts`)
+- [x] Game loop with update/render separation (`Scene.update()` + `Scene.render()`)
 - [ ] Pause/resume logic
 
 ### 7. Input Handling
@@ -50,7 +52,7 @@ This project aims to create a game engine using WebGPU + Typescript. It should p
 ### 8. Asset Management
 - [ ] GLTF/GLB model loader
 - [ ] Texture loading and format support
-- [ ] Material definition system
+- [ ] Material definition system (early stage)
 - [ ] Asset caching and preloading
 
 ### 9. Scene & Debug Tools
@@ -60,7 +62,7 @@ This project aims to create a game engine using WebGPU + Typescript. It should p
 - [ ] Wireframe mode, bounding boxes
 
 ### 10. Extensibility & Architecture
-- [ ] Plugin/component-based architecture
-- [ ] Shader module reuse
+- [x] Plugin/component-based architecture (emerging via modular design)
+- [x] Shader module reuse (Lambert shading modularized)
 - [ ] Messaging/event bus
 - [ ] Hot-reload support (optional)
