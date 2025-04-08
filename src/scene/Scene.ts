@@ -1,16 +1,16 @@
 import { SceneObject } from "./SceneObject.ts"
-import { FirstPersonCameraController } from "../camera/FirstPersonCameraController.ts"
+import { CameraController } from "../camera/CameraController.ts"
 
 export class Scene {
 	private objects: SceneObject[] = []
 	private time = 0
-	private cameraController?: FirstPersonCameraController
+	private cameraController?: CameraController
 
 	add(object: SceneObject) {
 		this.objects.push(object)
 	}
 
-	attachCameraController(controller: FirstPersonCameraController) {
+	attachCameraController(controller: CameraController) {
 		this.cameraController = controller
 	}
 
