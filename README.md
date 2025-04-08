@@ -8,7 +8,7 @@ This project aims to create a game engine using WebGPU + Typescript. It should p
 - ✅ Modular project structure (`src/` is now cleanly organized into `core/`, `render/`, `scene/`, etc.)
 - ✅ Build tooling (Vite/Webpack) (`vite` with TypeScript + Prettier)
 - ✅ WebGPU adapter check (`initWebGPU.ts` & `WebGPUDeviceManager`)
-- 🔲 Debug overlay
+- ✅ Debug overlay
 - 🔲 Scene inspector (dev-only)
 
 ### 2. Low-Level WebGPU Abstractions
@@ -16,7 +16,7 @@ This project aims to create a game engine using WebGPU + Typescript. It should p
 - ✅ Buffer abstraction (uniform, vertex, index, storage) (`GPUBufferWrapper.ts`)
 - ✅ Texture abstraction (2D, depth, shadow) (`GPUTextureWrapper.ts`)
 - ✅ Pipeline abstraction (`Material.ts`)
-- 🔲 Command encoder abstraction (currently used directly in `Renderer`)
+- ✅ Command encoder abstraction (`GPUCommandEncoderWrapper.ts`)
 
 ### 3. Rendering System
 - ✅ Basic forward renderer (`Renderer.ts` + `SceneObject`)
@@ -28,7 +28,7 @@ This project aims to create a game engine using WebGPU + Typescript. It should p
 ### 4. Camera System
 - ✅ Perspective camera (`Camera.ts`)
 - 🔲 Orthographic camera
-- 🔲 First-person camera controller
+- ✅ First-person camera controller
 - 🔲 Frustum culling
 - ✅ Camera matrix uniforms (`CameraUniform.ts`)
 
@@ -44,9 +44,9 @@ This project aims to create a game engine using WebGPU + Typescript. It should p
 - 🔲 Pause/resume logic
 
 ### 7. Input Handling
-- 🔲 Keyboard & mouse input tracking
+- ✅ Keyboard & mouse input tracking (`Input.ts`)
 - 🔲 Bindable input system
-- 🔲 Mouse lock support
+- ✅ Mouse lock support
 - 🔲 Configurable input mappings
 
 ### 8. Asset Management
@@ -58,7 +58,7 @@ This project aims to create a game engine using WebGPU + Typescript. It should p
 ### 9. Scene & Debug Tools
 - 🔲 Scene graph with hierarchy
 - 🔲 Scene loader/saver
-- 🔲 Debug UI tools (dat.GUI or custom)
+- ✅ Debug UI tools (custom overlay)
 - 🔲 Wireframe mode, bounding boxes
 
 ### 10. Extensibility & Architecture
