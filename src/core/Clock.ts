@@ -2,24 +2,25 @@ export class Clock {
 	private lastTime = performance.now()
 	private _deltaTime = 0
 	private _elapsed = 0
+	private _frame = 0
 
-	update(now: number) {
+	update(now: number): number {
 		this._deltaTime = (now - this.lastTime) / 1000
 		this._elapsed += this._deltaTime
 		this.lastTime = now
+		this._frame++
+		return this._deltaTime
 	}
 
 	get deltaTime(): number {
 		return this._deltaTime
 	}
 
-	get elapsedTime(): number {
+	get elapsed(): number {
 		return this._elapsed
 	}
 
-	reset() {
-		this.lastTime = performance.now()
-		this._deltaTime = 0
-		this._elapsed = 0
+	get frame(): number {
+		return this._frame
 	}
 }

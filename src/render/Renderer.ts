@@ -1,5 +1,6 @@
 import { WebGPUDeviceManager } from "../core/WebGPUDeviceManager.ts"
 import { GPUTextureWrapper } from "../core/GPUTextureWrapper.ts"
+import { GPUCommandEncoderWrapper } from "../core/GPUCommandEncoderWrapper.ts"
 import shaderCode from "../assets/shaders/lambert.wgsl?raw"
 import { Camera } from "../camera/Camera.ts"
 import { FirstPersonCameraController } from "../camera/FirstPersonCameraController.ts"
@@ -9,41 +10,32 @@ import { SceneObject } from "../scene/SceneObject.ts"
 import { Material } from "./Material.ts"
 import { LightUniform } from "./LightUniform.ts"
 import { Scene } from "../scene/Scene.ts"
+import { DebugOverlay } from "../ui/debug/DebugOverlay.ts"
+import { SurfaceManager } from "../core/SurfaceManager.ts"
 
 export class Renderer {
-	private depthTexture: GPUTextureWrapper
-	private camera = new Camera()
+	private depthTexture!: GPUTextureWrapper
+	private camera = new Camera({ aspect: SurfaceManager.aspect })
 	private cameraUniform = new CameraUniform()
 	private lightUniform = new LightUniform()
 	private scene = new Scene()
+	private debugOverlay = new DebugOverlay()
 
 	constructor() {
-		const canvas = WebGPUDeviceManager.context.canvas as HTMLCanvasElement
-		const width = canvas.width
-		const height = canvas.height
+		this.resize(SurfaceManager.width, SurfaceManager.height)
 
-		this.camera.aspect = width / height
-		this.cameraUniform.update(this.camera.viewProjection)
 		this.lightUniform.update([0.5, -1, -0.5], [1, 1, 1])
-
 		const controller = new FirstPersonCameraController(this.camera)
 		this.scene.attachCameraController(controller)
-
-		this.depthTexture = new GPUTextureWrapper(
-			width,
-			height,
-			"depth24plus",
-			GPUTextureUsage.RENDER_ATTACHMENT,
-		)
 
 		const cubeMesh = Mesh.createCube()
 		const material = new Material(shaderCode, [
 			{
 				arrayStride: 36,
 				attributes: [
-					{ shaderLocation: 0, offset: 0, format: "float32x3" }, // pos
-					{ shaderLocation: 1, offset: 12, format: "float32x3" }, // color
-					{ shaderLocation: 2, offset: 24, format: "float32x3" }, // normal
+					{ shaderLocation: 0, offset: 0, format: "float32x3" },
+					{ shaderLocation: 1, offset: 12, format: "float32x3" },
+					{ shaderLocation: 2, offset: 24, format: "float32x3" },
 				],
 			},
 		])
@@ -56,14 +48,27 @@ export class Renderer {
 		this.scene.add(cube)
 	}
 
+	resize(width: number, height: number) {
+		this.camera.aspect = width / height
+		this.depthTexture = new GPUTextureWrapper(
+			width,
+			height,
+			"depth24plus",
+			GPUTextureUsage.RENDER_ATTACHMENT,
+		)
+		this.cameraUniform.update(this.camera.viewProjection)
+	}
+
 	render(deltaTime: number) {
 		this.scene.update(deltaTime)
 		this.cameraUniform.update(this.camera.viewProjection)
 
 		const device = WebGPUDeviceManager.device
 		const context = WebGPUDeviceManager.context
-		const encoder = device.createCommandEncoder()
+		const encoder = new GPUCommandEncoderWrapper(device, "MainRenderEncoder")
 		const view = context.getCurrentTexture().createView()
+
+		encoder.debugGroup("Frame")
 
 		const pass = encoder.beginRenderPass({
 			colorAttachments: [
@@ -84,7 +89,13 @@ export class Renderer {
 
 		this.scene.render(pass)
 
-		pass.end()
+		encoder.endCurrentPass()
+		encoder.endDebugGroup()
 		device.queue.submit([encoder.finish()])
+
+		this.debugOverlay.update({
+			fps: 1 / deltaTime,
+			delta: deltaTime,
+		})
 	}
 }
